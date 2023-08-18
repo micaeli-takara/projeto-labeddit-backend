@@ -12,4 +12,4 @@ export interface LoginOutputDTO {
 export const LoginSchema = z.object({
     email: z.string().email('O email fornecido não está em um formato válido.'),
     password: z.string()
-});
+}).transform(data => data as LoginInputDTO);
