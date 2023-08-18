@@ -3,10 +3,11 @@ import { CreatePostInputDTO, CreatePostOutputDTO } from "../dto/post/createPost.
 import { DeletePostInputDTO, DeletePostOutputDTO } from "../dto/post/deletePost.dto";
 import { EditPostInputDTO, EditPostOutputDTO } from "../dto/post/editPost.dto";
 import { GetPostInputDTO, GetPostOutputDTO } from "../dto/post/getPost.dto";
+import { LikeOrDislikePostInputDTO, LikeOrDislikePostOutputDTO } from "../dto/post/likeOrDislikePost.dto";
 import { ForbiddenError } from "../errors/ForbiddenError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
-import { Post } from "../models/Posts";
+import { LikeDislikeDB, POST_LIKE, Post } from "../models/Posts";
 import { USER_ROLES } from "../models/Users";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
@@ -151,6 +152,79 @@ export class PostBusiness {
         await this.postDatabase.deletePostById(idToDelete)
 
         const output: DeletePostOutputDTO = undefined
+
+        return output
+    }
+
+    public likeOrDislikePost = async (
+        input: LikeOrDislikePostInputDTO
+    ): Promise<LikeOrDislikePostOutputDTO> => {
+        const { postId, token, like } = input
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if (!payload) {
+            throw new UnauthorizedError()
+        }
+
+        const postDBWithCreatorName = await this.postDatabase.findPostCreatorById(postId)
+
+        if (!postDBWithCreatorName) {
+            throw new NotFoundError("Esta postagem com este Id não existe")
+        }
+
+        const post = new Post(
+            postDBWithCreatorName.id,
+            postDBWithCreatorName.content,
+            postDBWithCreatorName.likes,
+            postDBWithCreatorName.dislikes,
+            postDBWithCreatorName.created_at,
+            postDBWithCreatorName.updated_at,
+            postDBWithCreatorName.creator_id,
+            postDBWithCreatorName.creator_name
+        )
+
+        const likeSQLite = like ? 1 : 0
+
+        const likeDislikeDB: LikeDislikeDB = {
+            user_id: payload.id,
+            post_id: postId,
+            like: likeSQLite
+        }
+
+        const likeDislikeExists = await this.postDatabase.findLikeDislike(likeDislikeDB)
+
+        if (likeDislikeExists === POST_LIKE.ON_LIKED) {
+            if (like) {
+                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                post.removeLike()
+
+            } else {
+                await this.postDatabase.updatedLikeDislike(likeDislikeDB)
+                post.removeLike()
+                post.addDislike()
+
+            }
+        } else if (likeDislikeExists === POST_LIKE.ON_DISLIKED) {
+            if (!like) {
+                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                post.removeDislike()
+
+            } else {
+                await this.postDatabase.updatedLikeDislike(likeDislikeDB)
+                post.removeDislike()
+                post.addLike()
+
+            }
+        } else {
+            await this.postDatabase.insertLikeDislike(likeDislikeDB)
+            like ? post.addLike() : post.addDislike()
+            
+        }
+        const updatedPostDB = post.toDBModel()
+        await this.postDatabase.updatePost(updatedPostDB)
+
+        const output: LikeOrDislikePostOutputDTO = undefined
 
         return output
     }
