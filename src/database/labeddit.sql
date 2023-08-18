@@ -46,7 +46,7 @@ CREATE TABLE post_likes_dislikes (
     ON DELETE CASCADE
 );
 
-INSERT INTO post_likes_dislikes (user_id, post_id, like_status)
+INSERT INTO post_likes_dislikes (user_id, post_id, like_status) -- O nome correto deve ser 'like', não 'like_status'
 VALUES
     ('u002', 'p001', 1),
     ('u003', 'p001', 1),
@@ -89,7 +89,7 @@ CREATE TABLE comment_likes_dislikes (
     ON DELETE CASCADE
 );
 
-INSERT INTO comment_likes_dislikes (user_id, comment_id, like_status)
+INSERT INTO comment_likes_dislikes (user_id, comment_id, like)
 VALUES
     ('u001', 'c001', 1),
     ('u002', 'c001', 1),
