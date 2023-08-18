@@ -19,8 +19,6 @@ app.use("/users", userRouter)
 
 app.use("/posts", postRouter)
 
-// routers das entidades
-
 app.get("/ping", (req, res) => {
     res.send("Pong!")
 })

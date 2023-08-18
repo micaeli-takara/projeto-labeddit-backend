@@ -1,6 +1,6 @@
 import { UserDatabase } from "../database/tables/UserDatabase";
-import { LoginInputDTO, LoginOutputDTO } from "../dto/login.dto";
-import { SignupInputDTO, SignupOutputDTO } from "../dto/signup.dto";
+import { LoginInputDTO, LoginOutputDTO } from "../dto/user/login.dto";
+import { SignupInputDTO, SignupOutputDTO } from "../dto/user/signup.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { TokenPayload, USER_ROLES, User } from "../models/Users";
 import { HashManager } from "../services/HashManager";
