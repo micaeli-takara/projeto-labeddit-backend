@@ -2,8 +2,8 @@ import { UserBusiness } from "../business/UserBusiness";
 import { ZodError } from "zod";
 import { BaseError } from "../errors/BaseError";
 import { Request, Response } from "express";
-import { SignupSchema } from "../dto/signup.dto";
-import { LoginSchema } from "../dto/login.dto";
+import { SignupSchema } from "../dto/user/signup.dto";
+import { LoginSchema } from "../dto/user/login.dto";
 
 export class UserController {
     constructor(
