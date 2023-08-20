@@ -1,19 +1,14 @@
-import { LikeDislikeDB, POST_LIKE, PostDB, PostDBWithCreatorName } from "../../models/Posts";
+import { LikeDislikeDB, POST_LIKE, PostDB, PostWithCreatorDB } from "../../models/Posts";
 import { BaseDatabase } from "../BaseDatabase";
 import { UserDatabase } from "./UserDatabase";
 
 export class PostDatabase extends BaseDatabase {
     public static TABLE_POST = "posts"
     public static TABLE_POST_LIKES_DISLIKES = "post_likes_dislikes"
+    public static TABLE_COMMENTS = "comments"
 
-    public insertPost = async (postDB: PostDB): Promise<void> => {
-        await BaseDatabase
-            .connection(PostDatabase.TABLE_POST)
-            .insert(postDB)
-    }
-
-    public getPostsWithCreatorsName = async (): Promise<PostDBWithCreatorName[]> => {
-        const result: PostDBWithCreatorName[] = await BaseDatabase
+    public async getPosts(): Promise<PostWithCreatorDB[]> {
+        const result: PostWithCreatorDB[] = await BaseDatabase
             .connection(PostDatabase.TABLE_POST)
             .select(
                 `${PostDatabase.TABLE_POST}.id`,
@@ -21,6 +16,7 @@ export class PostDatabase extends BaseDatabase {
                 `${PostDatabase.TABLE_POST}.content`,
                 `${PostDatabase.TABLE_POST}.likes`,
                 `${PostDatabase.TABLE_POST}.dislikes`,
+                `${PostDatabase.TABLE_POST}.comments_post`,
                 `${PostDatabase.TABLE_POST}.created_at`,
                 `${PostDatabase.TABLE_POST}.updated_at`,
                 `${UserDatabase.TABLE_USER}.name as creator_name`
@@ -31,8 +27,13 @@ export class PostDatabase extends BaseDatabase {
                 "=",
                 `${UserDatabase.TABLE_USER}.id`
             )
-
         return result
+    }
+
+    public insertPost = async (postDB: PostDB): Promise<void> => {
+        await BaseDatabase
+            .connection(PostDatabase.TABLE_POST)
+            .insert(postDB)
     }
 
     public findPostById = async (id: string): Promise<PostDB | undefined> => {
@@ -56,17 +57,19 @@ export class PostDatabase extends BaseDatabase {
             .where({ id })
     }
 
-    public findPostCreatorById = async (id: string): Promise<PostDBWithCreatorName | undefined> => {
+    public findPostCreatorById = async (id: string): Promise<PostWithCreatorDB | undefined> => {
         const [result] = await BaseDatabase
             .connection(PostDatabase.TABLE_POST)
             .select(
                 `${PostDatabase.TABLE_POST}.id`,
-                `${PostDatabase.TABLE_POST}.creator_id`,
                 `${PostDatabase.TABLE_POST}.content`,
                 `${PostDatabase.TABLE_POST}.likes`,
                 `${PostDatabase.TABLE_POST}.dislikes`,
-                `${PostDatabase.TABLE_POST}.created_at`,
+                `${PostDatabase.TABLE_POST}.comments_post`,
+                `${PostDatabase.TABLE_POST}.
+                created_at`,
                 `${PostDatabase.TABLE_POST}.updated_at`,
+                `${PostDatabase.TABLE_POST}.creator_id`,
                 `${UserDatabase.TABLE_USER}.name as creator_name`
             )
             .join(
@@ -77,7 +80,7 @@ export class PostDatabase extends BaseDatabase {
             )
         .where({ [`${PostDatabase.TABLE_POST}.id`]: id })
 
-        return result as PostDBWithCreatorName | undefined
+        return result as PostWithCreatorDB | undefined
     }
 
     public findLikeDislike = async (likeDislikeDB: LikeDislikeDB): Promise<POST_LIKE | undefined> => {

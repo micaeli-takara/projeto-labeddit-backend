@@ -1,188 +1,167 @@
-export interface CommentDB {
-    id: string,
-    post_id: string,
-    user_id: string,
-    content: string,
-    likes: number,
-    dislikes: number,
-    created_at: string
-}
-
-export interface CommentLikeDislikeDB {
-    user_id: string,
-    comment_id: string,
-    like: number
-}
-
-export enum COMMENT_LIKE {
-    ON_LIKED = "ON LIKED",
-    ON_DISLIKED = "ON DISLIKED"
-}
-
 
 export interface CommentModel {
     id: string,
+    postId: string,
     content: string,
     likes: number,
     dislikes: number,
     createdAt: string,
-    post: {
+    updatedAt: string,
+    creator: {
         id: string,
-        creatorId: string,
-        creatorName: string,
-        content: string,
-        createdAt: string,
-        updatedAt: string
-    },
-    user: {
-        id: string,
-        name: string
+        nickname: string
     }
+}
+
+export interface CommentDB {
+    id: string,
+    creator_id: string,
+    post_id: string,
+    content: string,
+    likes: number,
+    dislikes: number,
+    created_at: string,
+    updated_at: string
+}
+
+export interface CommentWithCreatorDB extends CommentDB {
+    creator_nickname: string
+}
+
+export interface LikesDislikesCommentsDB {
+    user_id: string,
+    comments_id: string,
+    like: number
 }
 
 export class Comment {
     constructor(
         private id: string,
+        private postId: string,
         private content: string,
         private likes: number,
         private dislikes: number,
         private createdAt: string,
-        private postId: string,
-        private userId: string,
-        private postContent: string,
-        private postCreatedAt: string,
-        private postUpdatedAt: string,
+        private updatedAt: string,
         private creatorId: string,
-        private creatorName: string
-    ) { }
+        private creatorNickname: string
+    ) {}
 
-    public getId(): string {
-        return this.id;
+    public getId() : string {
+        return this.id
     }
-    public setId(value: string): void {
-        this.id = value;
-    }
-
-    public getContent(): string {
-        return this.content;
-    }
-    public setContent(value: string): void {
-        this.content = value;
+ 
+    public setId (value : string): void {
+        this.id = value
     }
 
-    public getLikes(): number {
-        return this.likes;
+    public getPostId() : string {
+        return this.postId
     }
-    public setLikes(value: number): void {
-        this.likes = value;
-    }
-    public addLike(): void {
-        this.likes++;
-    }
-    public removeLike(): void {
-        this.likes--;
+ 
+    public setPostId (value : string): void {
+        this.postId = value
     }
 
-    public getDislikes(): number {
-        return this.dislikes;
+    public getContent() : string {
+        return this.content
     }
-    public setDislikes(value: number): void {
-        this.dislikes = value;
+ 
+    public setContent (value : string): void {
+        this.content = value
     }
-    public addDislike(): void {
-        this.dislikes++;
+
+    public getLikes() : number {
+        return this.likes
     }
-    public removeDislike(): void {
-        this.dislikes--;
+ 
+    public setLikes (value : number): void {
+        this.likes = value
+    }
+
+    public addLike() {
+        this.likes += 1
+    }
+
+    public removeLike() {
+        this.likes -= 1
+    }
+
+    public getDislikes() : number {
+        return this.dislikes
+    }
+ 
+    public setDislikes (value : number): void {
+        this.dislikes = value
+    }
+
+    public addDislike() {
+        this.dislikes += 1
+    }
+
+    public removeDislike() {
+        this.dislikes -= 1
     }
 
     public getCreatedAt(): string {
-        return this.createdAt;
+        return this.createdAt
     }
+
     public setCreatedAt(value: string): void {
-        this.createdAt = value;
+        this.createdAt = value
+    }
+    
+    public getUpdatedAt(): string {
+        return this.updatedAt
     }
 
-    public getPostId(): string {
-        return this.postId;
-    }
-    public setPostId(value: string): void {
-        this.postId = value;
+    public setUpdatedAt(value: string): void {
+        this.updatedAt = value
     }
 
-    public getUserId(): string {
-        return this.userId;
+    public getCreatorId() : string {
+        return this.creatorId
     }
-    public setUserId(value: string): void {
-        this.userId = value;
-    }
-
-    public getPostContent(): string {
-        return this.postContent;
-    }
-    public setPostContent(value: string): void {
-        this.postContent = value;
+ 
+    public setCreatorId (value : string): void {
+        this.creatorId = value
     }
 
-    public getPostCreatedAt(): string {
-        return this.postCreatedAt;
+    public getCreatorNickname() : string {
+        return this.creatorNickname
     }
-    public setPostCreatedAt(value: string): void {
-        this.postCreatedAt = value;
-    }
-
-    public getPostUpdatedAt(): string {
-        return this.postUpdatedAt;
-    }
-    public setPostUpdatedAt(value: string): void {
-        this.postUpdatedAt = value;
+ 
+    public setCreatorNickname (value : string): void {
+        this.creatorNickname = value
     }
 
-    public getCreatorId(): string {
-        return this.creatorId;
-    }
-    public setCreatorId(value: string): void {
-        this.creatorId = value;
-    }
-
-    public getCreatorName(): string {
-        return this.creatorName;
-    }
-    public setCreatorName(value: string): void {
-        this.creatorName = value;
-    }
-
-    public toDBModel(): CommentDB {
-        return {
+    public toCommentDBModel(): CommentDB{
+        return{
             id: this.id,
+            creator_id: this.creatorId,
             post_id: this.postId,
-            user_id: this.userId,
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
-            created_at: this.createdAt
-        };
+            created_at: this.createdAt,
+            updated_at: this.updatedAt
+        }
     }
 
-    public toModel(): CommentModel {
+    public toBusinessModel(): CommentModel {
         return {
             id: this.id,
+            postId: this.postId,
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
             createdAt: this.createdAt,
-            post: {
-                id: this.postId,
-                creatorId: this.creatorId,
-                creatorName: this.creatorName,
-                content: this.postContent,
-                createdAt: this.postCreatedAt,
-                updatedAt: this.postUpdatedAt
-            },
-            user: {
-                id: this.userId,
-                name: this.creatorName
+            updatedAt: this.updatedAt,
+            creator: {
+                id: this.creatorId,
+                nickname: this.creatorNickname
             }
-        };
+        }
     }
+
 }

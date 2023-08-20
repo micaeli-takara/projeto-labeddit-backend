@@ -4,10 +4,11 @@ import { DeletePostInputDTO, DeletePostOutputDTO } from "../dto/post/deletePost.
 import { EditPostInputDTO, EditPostOutputDTO } from "../dto/post/editPost.dto";
 import { GetPostInputDTO, GetPostOutputDTO } from "../dto/post/getPost.dto";
 import { LikeOrDislikePostInputDTO, LikeOrDislikePostOutputDTO } from "../dto/post/likeOrDislikePost.dto";
+import { BadRequestError } from "../errors/BadRequestError";
 import { ForbiddenError } from "../errors/ForbiddenError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
-import { LikeDislikeDB, POST_LIKE, Post } from "../models/Posts";
+import { LikeDislikeDB, POST_LIKE, Post, PostWithCreatorDB } from "../models/Posts";
 import { USER_ROLES } from "../models/Users";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
@@ -19,7 +20,7 @@ export class PostBusiness {
         private tokenManager: TokenManager
     ) { }
 
-    public createPost = async (
+    public createPost = async ( 
         input: CreatePostInputDTO
     ): Promise<CreatePostOutputDTO> => {
         const { content, token } = input
@@ -30,17 +31,26 @@ export class PostBusiness {
             throw new UnauthorizedError()
         }
 
+        const tokenPayload = this.tokenManager.getPayload(token)
+
+        if (tokenPayload === null) {
+            throw new BadRequestError("'token' inválido")
+        }
+
         const id = this.idGenerator.generate()
+        const creatorId = tokenPayload.id
+        const creatorName = tokenPayload.name
 
         const post = new Post(
             id,
             content,
             0,
             0,
+            0,
             new Date().toISOString(),
             new Date().toISOString(),
-            payload.id,
-            payload.name
+            creatorId,
+            creatorName
         )
 
         const postDB = post.toDBModel()
@@ -62,18 +72,19 @@ export class PostBusiness {
             throw new UnauthorizedError()
         }
 
-        const postDBWithCreatorName = await this.postDatabase.getPostsWithCreatorsName()
+        const postsDB: PostWithCreatorDB[] = await this.postDatabase.getPosts()
 
-        const posts = postDBWithCreatorName.map((postWithCreatorName) => {
+        const posts = postsDB.map((postsDB) => {
             const post = new Post(
-                postWithCreatorName.id,
-                postWithCreatorName.content,
-                postWithCreatorName.likes,
-                postWithCreatorName.dislikes,
-                postWithCreatorName.created_at,
-                postWithCreatorName.updated_at,
-                postWithCreatorName.creator_id,
-                postWithCreatorName.creator_name
+                postsDB.id,
+                postsDB.content,
+                postsDB.likes,
+                postsDB.dislikes,
+                postsDB.comments_post,
+                postsDB.created_at,
+                postsDB.updated_at,
+                postsDB.creator_id,
+                postsDB.creator_name
             )
 
             return post.toModel()
@@ -109,6 +120,7 @@ export class PostBusiness {
             postDB.content,
             postDB.likes,
             postDB.dislikes,
+            postDB.comments_post,
             postDB.created_at,
             postDB.updated_at,
             postDB.creator_id,
@@ -168,21 +180,24 @@ export class PostBusiness {
         }
 
         const postDBWithCreatorName = await this.postDatabase.findPostCreatorById(postId)
-
         if (!postDBWithCreatorName) {
             throw new NotFoundError("Esta postagem com este Id não existe")
         }
+        console.log(postDBWithCreatorName)
 
         const post = new Post(
             postDBWithCreatorName.id,
             postDBWithCreatorName.content,
             postDBWithCreatorName.likes,
             postDBWithCreatorName.dislikes,
+            postDBWithCreatorName.comments_post,
             postDBWithCreatorName.created_at,
             postDBWithCreatorName.updated_at,
             postDBWithCreatorName.creator_id,
             postDBWithCreatorName.creator_name
         )
+
+        console.log(post)
 
         const likeSQLite = like ? 1 : 0
 

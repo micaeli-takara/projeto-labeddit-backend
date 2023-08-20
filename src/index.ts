@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { postRouter } from './routes/postRouter'
 import { userRouter } from './routes/userRouter'
+import { commentRouter } from './routes/commentRouter'
 
 dotenv.config()
 
@@ -18,6 +19,8 @@ app.listen(Number(process.env.PORT) || 3003, () => {
 app.use("/users", userRouter)
 
 app.use("/posts", postRouter)
+
+app.use("/comments", commentRouter)
 
 app.get("/ping", (req, res) => {
     res.send("Pong!")

@@ -15,17 +15,18 @@ VALUES
     ('u002', 'Beltrana', 'BeltranaLinda','beltrana@email.com', '$2a$12$403HVkfVSUbDioyciv9IC.oBlgMqudbnQL8ubebJIXScNs8E3jYe2', 'NORMAL'),
     ('u003', 'Astrodev', 'Astrodev1990','astrodev@email.com', '$2a$12$lHyD.hKs3JDGu2nIbBrxYujrnfIX5RW5oq/B41HCKf7TSaq9RgqJ.', 'ADMIN');
 
-CREATE TABLE posts (
+CREATE TABLE posts(
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
     creator_id TEXT NOT NULL,
     content TEXT NOT NULL,
     likes INTEGER DEFAULT (0) NOT NULL,
     dislikes INTEGER DEFAULT (0) NOT NULL,
+    comments_post INTEGER DEFAULT (0) NOT NULL,
     created_at TEXT DEFAULT (DATETIME()) NOT NULL,
     updated_at TEXT DEFAULT (DATETIME()) NOT NULL,
     FOREIGN KEY (creator_id) REFERENCES users(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE
+        ON DELETE CASCADE 
+        ON UPDATE CASCADE
 );
 
 INSERT INTO posts (id, creator_id, content)
@@ -46,7 +47,7 @@ CREATE TABLE post_likes_dislikes (
     ON DELETE CASCADE
 );
 
-INSERT INTO post_likes_dislikes (user_id, post_id, like_status) -- O nome correto deve ser 'like', não 'like_status'
+INSERT INTO post_likes_dislikes (user_id, post_id, like)
 VALUES
     ('u002', 'p001', 1),
     ('u003', 'p001', 1),
@@ -57,20 +58,21 @@ VALUES
 CREATE TABLE comments (
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
     post_id TEXT NOT NULL,
-    user_id TEXT NOT NULL,
+    creator_id TEXT NOT NULL,
     content TEXT NOT NULL,
     likes INTEGER DEFAULT (0) NOT NULL,
     dislikes INTEGER DEFAULT (0) NOT NULL,
+    updated_at TEXT DEFAULT (DATETIME()) NOT NULL,
     created_at TEXT DEFAULT (DATETIME()) NOT NULL,
     FOREIGN KEY (post_id) REFERENCES posts(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (creator_id) REFERENCES users(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
 );
 
-INSERT INTO comments (id, post_id, user_id, content)
+INSERT INTO comments (id, post_id, creator_id, content)
 VALUES
     ('c001', 'p001', 'u003', 'Ótimo post! Concordo com tudo.'),
     ('c002', 'p001', 'u002', 'Não poderia estar mais de acordo.'),
