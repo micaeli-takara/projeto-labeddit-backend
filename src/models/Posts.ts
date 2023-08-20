@@ -1,28 +1,12 @@
-import { CommentModel } from "./Comments"
-
-export interface PostModelWithComments extends PostModel {
-    comments: CommentModel[];
-}
-
 export interface PostDB {
     id: string,
     creator_id: string,
     content: string,
     likes: number,
     dislikes: number,
+    comments_post: number,
     created_at: string,
-    updated_at: string,
-}
-
-export interface PostDBWithCreatorName {
-    id: string,
-    creator_id: string,
-    content: string,
-    likes: number,
-    dislikes: number,
-    created_at: string,
-    updated_at: string,
-    creator_name: string // Adicione esta linha
+    updated_at: string
 }
 
 export interface PostModel {
@@ -30,12 +14,17 @@ export interface PostModel {
     content: string,
     likes: number,
     dislikes: number,
+    commentsPost: number,
     createdAt: string,
     updatedAt: string,
     creator: {
         id: string,
         name: string
     }
+}
+
+export interface PostWithCreatorDB extends PostDB {
+    creator_name: string
 }
 
 export interface LikeDislikeDB{
@@ -55,6 +44,7 @@ export class Post {
         private content: string,
         private likes: number,
         private dislikes: number,
+        private commentsPost: number,
         private createdAt: string,
         private updatedAt: string,
         private creatorId: string,
@@ -103,6 +93,18 @@ export class Post {
         this.dislikes --
     }
 
+    public getCommentsPost() : number {
+        return this.commentsPost
+    }
+ 
+    public setCommentsPost (value : number): void {
+        this.commentsPost = value
+    }
+
+    public addCommentsPosts() {
+        this.commentsPost ++
+    }
+
     public getCreatedAt(): string {
         return this.createdAt
     }
@@ -138,24 +140,25 @@ export class Post {
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            comments_post: this.commentsPost,
             created_at: this.createdAt,
             updated_at: this.updatedAt
         };
     }
 
-    public toModel(): PostModelWithComments {
+    public toModel(): PostModel {
         return {
             id: this.id,
             content: this.content,
             likes: this.likes,
             dislikes: this.dislikes,
+            commentsPost: this.commentsPost,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             creator: {
                 id: this.creatorId,
                 name: this.creatorName
-            },
-            comments: [] // Adicione esta linha para inicializar a propriedade comments
+            }
         };
     }
 }   

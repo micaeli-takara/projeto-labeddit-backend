@@ -124,7 +124,7 @@ export class PostController {
                 token: req.headers.authorization,
                 like: req.body.like
             })
-
+            
             const output = await this.postBusiness.likeOrDislikePost(input)
 
             res.status(200).send(output)
