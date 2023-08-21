@@ -9,7 +9,7 @@ import { Post } from '../models/Posts';
 import { CreatePostOutputDTO } from '../dto/post/createPost.dto';
 import { PostDatabase } from '../database/tables/PostDatabase';
 import { GetCommentInputDTO, GetCommentOutputDTO } from '../dto/comment/getComment.dto';
-import { GetPostOutputDTO } from '../dto/post/getPost.dto';
+import { EditCommentInputDTO, EditCommentOutputDTO } from '../dto/comment/editComment.dto';
 
 export class CommentBusiness {
     constructor(
@@ -19,9 +19,7 @@ export class CommentBusiness {
         private tokenManager: TokenManager
     ) { }
 
-    public createComment = async (
-        input: CreateCommentInputDTO
-    ): Promise<CreateCommentOutputDTO> => {
+    public createComment = async (input: CreateCommentInputDTO): Promise<CreateCommentOutputDTO> => {
         const { id, token, content } = input
 
 
@@ -85,44 +83,101 @@ export class CommentBusiness {
         return output
     }
 
-    public getComment = async (input: GetCommentInputDTO): Promise <GetCommentOutputDTO> => {
-       const {id, token} = input
+    public getComment = async (input: GetCommentInputDTO): Promise<GetCommentOutputDTO> => {
+        const { id, token } = input
 
-       if (token === undefined) {
-        throw new BadRequestError("'token' ausente")
+        if (token === undefined) {
+            throw new BadRequestError("'token' ausente")
+        }
+
+        const tokenPayload = this.tokenManager.getPayload(token)
+
+        if (tokenPayload === null) {
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const commentsDB: CommentWithCreatorDB[] = await this.commentDatabase.getComment(id)
+
+        if (!commentsDB) {
+            throw new NotFoundError("'id' não encontrado")
+        }
+
+        const comments = commentsDB.map((commentDB) => {
+            const comment = new Comment(
+                commentDB.id,
+                commentDB.post_id,
+                commentDB.content,
+                commentDB.likes,
+                commentDB.dislikes,
+                commentDB.created_at,
+                commentDB.updated_at,
+                commentDB.creator_id,
+                commentDB.creator_name
+            )
+            return comment.toModel()
+        })
+
+        const output: GetCommentOutputDTO = comments
+
+        return output
+
+
     }
 
-    const tokenPayload = this.tokenManager.getPayload(token)
+    public editComment = async (input: EditCommentInputDTO):Promise<EditCommentOutputDTO> => {
 
-    if (tokenPayload === null) {
-        throw new BadRequestError("'token' inválido")
-    }
+        const { id, token, content } = input
 
-    const commentsDB: CommentWithCreatorDB[] = await this.commentDatabase.getComment(id)
+        if (token === undefined) {
+            throw new BadRequestError("'token' ausente")
+        }
 
-    if (!commentsDB) {
-        throw new NotFoundError("'id' não encontrado")
-    }
+        if (content.length <= 0) {
+            throw new BadRequestError("'content' não pode ser zero ou negativo")
+        }
 
-    const comments = commentsDB.map((commentDB) => {
-        const comment = new Comment(
-            commentDB.id,
-            commentDB.post_id,
-            commentDB.content,
-            commentDB.likes,
-            commentDB.dislikes,
-            commentDB.created_at,
-            commentDB.updated_at,
-            commentDB.creator_id,
-            commentDB.creator_name
+        const tokenPayload = this.tokenManager.getPayload(token)
+
+        if (tokenPayload === null) {
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const commentToEditDB = await this.commentDatabase.findComment(id)
+
+        if (!commentToEditDB) {
+            throw new NotFoundError("'id' não encontrado")
+        }
+
+        const creatorId = tokenPayload.id
+
+        if (commentToEditDB.creator_id !== creatorId) {
+            throw new BadRequestError("usuário não autorizado a editar este comentário")
+        }
+
+        const creatorName = tokenPayload.name
+
+        const commentToEdit = new Comment(
+            commentToEditDB.id,
+            commentToEditDB.post_id,
+            commentToEditDB.content,
+            commentToEditDB.likes,
+            commentToEditDB.dislikes,
+            commentToEditDB.created_at,
+            commentToEditDB.updated_at,
+            creatorId,
+            creatorName
         )
-        return comment.toModel()
-    })
 
-    const output: GetCommentOutputDTO = comments
+        commentToEdit.setContent(content)
+        commentToEdit.setUpdatedAt(new Date().toISOString())
 
-    return output
+        const updatedCommentDB = commentToEdit.toCommentDB()
 
+        await this.commentDatabase.updateComment(updatedCommentDB)
+
+        const output: EditCommentOutputDTO = undefined
+
+        return output
 
     }
 }

@@ -25,7 +25,6 @@ export class UserBusiness {
         const user = new User(
             id,
             name,
-            surname,
             email,
             hashedPassword,
             USER_ROLES.NORMAL,
@@ -62,7 +61,6 @@ export class UserBusiness {
         const user = new User(
             userDB.id,
             userDB.name,
-            userDB.surname,
             userDB.email,
             userDB.password,
             userDB.role,
