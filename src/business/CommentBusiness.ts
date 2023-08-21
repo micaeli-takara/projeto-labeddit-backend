@@ -4,10 +4,12 @@ import { CommentDatabase } from '../database/tables/CommentDatabase';
 import { CreateCommentInputDTO, CreateCommentOutputDTO } from '../dto/comment/createComment.dto';
 import { BadRequestError } from '../errors/BadRequestError';
 import { NotFoundError } from '../errors/NotFoundError';
-import { Comment } from '../models/Comments';
+import { Comment, CommentWithCreatorDB } from '../models/Comments';
 import { Post } from '../models/Posts';
 import { CreatePostOutputDTO } from '../dto/post/createPost.dto';
 import { PostDatabase } from '../database/tables/PostDatabase';
+import { GetCommentInputDTO, GetCommentOutputDTO } from '../dto/comment/getComment.dto';
+import { GetPostOutputDTO } from '../dto/post/getPost.dto';
 
 export class CommentBusiness {
     constructor(
@@ -59,7 +61,7 @@ export class CommentBusiness {
             creatorName
         )
 
-        const newCommentDB = comment.toCommentDBModel()
+        const newCommentDB = comment.toCommentDB()
         await this.commentDatabase.insertComment(newCommentDB)
 
         const updateCommentCount = new Post(
@@ -81,5 +83,46 @@ export class CommentBusiness {
         const output: CreatePostOutputDTO = undefined
 
         return output
+    }
+
+    public getComment = async (input: GetCommentInputDTO): Promise <GetCommentOutputDTO> => {
+       const {id, token} = input
+
+       if (token === undefined) {
+        throw new BadRequestError("'token' ausente")
+    }
+
+    const tokenPayload = this.tokenManager.getPayload(token)
+
+    if (tokenPayload === null) {
+        throw new BadRequestError("'token' inválido")
+    }
+
+    const commentsDB: CommentWithCreatorDB[] = await this.commentDatabase.getComment(id)
+
+    if (!commentsDB) {
+        throw new NotFoundError("'id' não encontrado")
+    }
+
+    const comments = commentsDB.map((commentDB) => {
+        const comment = new Comment(
+            commentDB.id,
+            commentDB.post_id,
+            commentDB.content,
+            commentDB.likes,
+            commentDB.dislikes,
+            commentDB.created_at,
+            commentDB.updated_at,
+            commentDB.creator_id,
+            commentDB.creator_name
+        )
+        return comment.toModel()
+    })
+
+    const output: GetCommentOutputDTO = comments
+
+    return output
+
+
     }
 }
