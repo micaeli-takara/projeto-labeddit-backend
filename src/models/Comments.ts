@@ -127,11 +127,11 @@ export class Comment {
         this.creatorId = value
     }
 
-    public getCreatorNickname() : string {
+    public getCreatorName() : string {
         return this.creatorName
     }
  
-    public setCreatorNickname (value : string): void {
+    public setCreatorName (value : string): void {
         this.creatorName = value
     }
 

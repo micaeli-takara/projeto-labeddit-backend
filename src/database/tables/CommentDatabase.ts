@@ -23,14 +23,7 @@ export class CommentDatabase extends BaseDatabase {
         return postDB
     }
 
-    public async updatePost(postDB: PostDB): Promise<void> {
-        await BaseDatabase
-            .connection(PostDatabase.TABLE_POST)
-            .update(postDB)
-            .where({ id: postDB.id })
-    }
-
-    public async getComment(id: string) {
+    public async getComment(id: string)  {
         const result = await BaseDatabase
             .connection(CommentDatabase.TABLE_COMMENT)
             .select(
@@ -52,5 +45,19 @@ export class CommentDatabase extends BaseDatabase {
             ).where({ post_id: id})
 
         return result
+    }
+
+    public async findComment(id: string): Promise<CommentDB | undefined> {
+        const [commentDB]: CommentDB[] | undefined = await BaseDatabase
+            .connection(CommentDatabase.TABLE_COMMENT)
+            .where({ id: id })
+        return commentDB
+    }
+
+    public async updateComment(commentDB: CommentDB): Promise<void> {
+        await BaseDatabase
+            .connection(CommentDatabase.TABLE_COMMENT)
+            .update(commentDB)
+            .where({ id: commentDB.id })
     }
 }

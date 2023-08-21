@@ -15,7 +15,6 @@ export class UserController {
 
             const input = SignupSchema.parse({
                 name: req.body.name,
-                surname: req.body.surname,
                 email: req.body.email,
                 password: req.body.password,
                 agreeToEmails: req.body.agreeToEmails

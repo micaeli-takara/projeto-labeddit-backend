@@ -12,7 +12,6 @@ export interface TokenPayload {
 export interface UserDB {
     id: string;
     name: string;
-    surname: string;
     email: string;
     password: string;
     role: USER_ROLES;
@@ -22,7 +21,6 @@ export interface UserDB {
 export interface UserModel {
     id: string;
     name: string;
-    surname: string;
     email: string;
     password: string;
     role: USER_ROLES;
@@ -34,7 +32,6 @@ export class User {
     constructor(
         private id: string,
         private name: string,
-        private surname: string,
         private email: string,
         private password: string,
         private role: USER_ROLES,
@@ -53,13 +50,6 @@ export class User {
     }
     public setName(value: string): void {
         this.name = value
-    }
-
-    public getSurname(): string {
-        return this.surname
-    }
-    public setSurname (value: string): void {
-        this.surname = value
     }
 
     public getEmail(): string {
@@ -94,7 +84,6 @@ export class User {
         return {
             id: this.id,
             name: this.name,
-            surname: this.surname,
             email: this.email,
             password: this.password,
             role: this.role,
@@ -106,7 +95,6 @@ export class User {
         return {
             id: this.id,
             name: this.name,
-            surname: this.surname,
             email: this.email,
             password: this.password,
             role: this.role,
