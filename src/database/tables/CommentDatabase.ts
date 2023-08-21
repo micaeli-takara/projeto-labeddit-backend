@@ -1,9 +1,11 @@
+import { CommentBusiness } from "../../business/CommentBusiness";
 import { CommentDB } from "../../models/Comments";
 import { PostDB, PostWithCreatorDB } from "../../models/Posts";
 import { BaseDatabase } from "../BaseDatabase";
 import { PostDatabase } from "./PostDatabase";
+import { UserDatabase } from "./UserDatabase";
 
-export class CommentDatabase extends BaseDatabase { 
+export class CommentDatabase extends BaseDatabase {
     public static TABLE_COMMENT = "comments"
     public static TABLE_COMMENT_LIKES_DISLIKES = "comment_likes_dislikes"
     public static TABLE_POST = "posts"
@@ -26,5 +28,29 @@ export class CommentDatabase extends BaseDatabase {
             .connection(PostDatabase.TABLE_POST)
             .update(postDB)
             .where({ id: postDB.id })
+    }
+
+    public async getComment(id: string) {
+        const result = await BaseDatabase
+            .connection(CommentDatabase.TABLE_COMMENT)
+            .select(
+                `${CommentDatabase.TABLE_COMMENT}.id`,
+                `${CommentDatabase.TABLE_COMMENT}.post_id`,
+                `${CommentDatabase.TABLE_COMMENT}.content`,
+                `${CommentDatabase.TABLE_COMMENT}.likes`,
+                `${CommentDatabase.TABLE_COMMENT}.dislikes`,
+                `${CommentDatabase.TABLE_COMMENT}.created_at`,
+                `${CommentDatabase.TABLE_COMMENT}.updated_at`,
+                `${CommentDatabase.TABLE_COMMENT}.creator_id`,
+                `${UserDatabase.TABLE_USER}.name as creator_name`
+
+            ).join(
+                `${UserDatabase.TABLE_USER}`,
+                `${CommentDatabase.TABLE_COMMENT}.creator_id`,
+                "=",
+                `${UserDatabase.TABLE_USER}.id`
+            ).where({ post_id: id})
+
+        return result
     }
 }

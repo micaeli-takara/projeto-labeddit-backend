@@ -9,7 +9,7 @@ export interface CommentModel {
     updatedAt: string,
     creator: {
         id: string,
-        nickname: string
+        name: string
     }
 }
 
@@ -25,7 +25,7 @@ export interface CommentDB {
 }
 
 export interface CommentWithCreatorDB extends CommentDB {
-    creator_nickname: string
+    creator_name: string
 }
 
 export interface LikesDislikesCommentsDB {
@@ -44,7 +44,7 @@ export class Comment {
         private createdAt: string,
         private updatedAt: string,
         private creatorId: string,
-        private creatorNickname: string
+        private creatorName: string
     ) {}
 
     public getId() : string {
@@ -128,14 +128,14 @@ export class Comment {
     }
 
     public getCreatorNickname() : string {
-        return this.creatorNickname
+        return this.creatorName
     }
  
     public setCreatorNickname (value : string): void {
-        this.creatorNickname = value
+        this.creatorName = value
     }
 
-    public toCommentDBModel(): CommentDB{
+    public toCommentDB(): CommentDB{
         return{
             id: this.id,
             creator_id: this.creatorId,
@@ -148,7 +148,7 @@ export class Comment {
         }
     }
 
-    public toBusinessModel(): CommentModel {
+    public toModel(): CommentModel {
         return {
             id: this.id,
             postId: this.postId,
@@ -159,7 +159,7 @@ export class Comment {
             updatedAt: this.updatedAt,
             creator: {
                 id: this.creatorId,
-                nickname: this.creatorNickname
+                name: this.creatorName
             }
         }
     }
