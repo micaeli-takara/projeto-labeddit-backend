@@ -247,8 +247,7 @@ export class CommentBusiness {
         }
 
         const likeDislikeDB: LikesDislikesCommentsDB = {
-            user_id: userId,,
-            
+            user_id: userId,
             comments_id: likeDislikeCommentDB.id,
             like: likeDB
         }
