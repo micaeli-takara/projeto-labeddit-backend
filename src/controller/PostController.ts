@@ -127,7 +127,17 @@ export class PostController {
             
             const output = await this.postBusiness.likeOrDislikePost(input)
 
-            res.status(200).send(output)
+            let message;
+            if (input.like) {
+                message = "Comentário curtido com sucesso!";
+            } else {
+                message = "Comentário descurtido com sucesso!";
+            }
+
+            res.status(200).send({
+                message,
+                output
+            });
 
         } catch (error) {
             console.log(error)

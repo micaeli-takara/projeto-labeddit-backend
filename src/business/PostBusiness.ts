@@ -28,7 +28,7 @@ export class PostBusiness {
         const payload = this.tokenManager.getPayload(token)
 
         if (!payload) {
-            throw new UnauthorizedError()
+            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
         }
 
         const tokenPayload = this.tokenManager.getPayload(token)
@@ -69,7 +69,7 @@ export class PostBusiness {
         const payload = this.tokenManager.getPayload(token)
 
         if (!payload) {
-            throw new UnauthorizedError()
+            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
         }
 
         const postsDB: PostWithCreatorDB[] = await this.postDatabase.getPosts()
@@ -102,17 +102,17 @@ export class PostBusiness {
         const payload = this.tokenManager.getPayload(token)
 
         if (!payload) {
-            throw new UnauthorizedError()
+            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
         }
 
         const postDB = await this.postDatabase.findPostById(idToEdit)
 
         if (!postDB) {
-            throw new NotFoundError("O Id não corresponde á nenhuma postagem")
+            throw new NotFoundError("Postagem não encontrada.")
         }
 
         if (payload.id !== postDB.creator_id) {
-            throw new ForbiddenError("Você não tem permissão para editar este Post")
+            throw new ForbiddenError("Você não tem permissão para editar esta postagem.")
         }
 
         const post = new Post(
@@ -146,18 +146,18 @@ export class PostBusiness {
         const payload = this.tokenManager.getPayload(token)
 
         if (!payload) {
-            throw new UnauthorizedError()
+            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
         }
 
         const postDB = await this.postDatabase.findPostById(idToDelete)
 
         if (!postDB) {
-            throw new NotFoundError("O Id não corresponde á nenhuma postagem")
+            throw new NotFoundError("Postagem não encontrada.")
         }
 
         if (payload.role !== USER_ROLES.ADMIN) {
             if (payload.id !== postDB.creator_id) {
-                throw new ForbiddenError("Você não tem permissão para editar este Post")
+                throw new ForbiddenError("Você não tem permissão para excluir esta postagem")
             }
         }
 
@@ -176,12 +176,12 @@ export class PostBusiness {
         const payload = this.tokenManager.getPayload(token)
 
         if (!payload) {
-            throw new UnauthorizedError()
+            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
         }
 
         const postDBWithCreatorName = await this.postDatabase.findPostCreatorById(postId)
         if (!postDBWithCreatorName) {
-            throw new NotFoundError("Esta postagem com este Id não existe")
+            throw new NotFoundError("Postagem não encontrada.")
         }
         console.log(postDBWithCreatorName)
 

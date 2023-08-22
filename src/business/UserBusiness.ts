@@ -2,6 +2,7 @@ import { UserDatabase } from "../database/tables/UserDatabase";
 import { LoginInputDTO, LoginOutputDTO } from "../dto/user/login.dto";
 import { SignupInputDTO, SignupOutputDTO } from "../dto/user/signup.dto";
 import { BadRequestError } from "../errors/BadRequestError";
+import { ConflictError } from "../errors/ConflictError";
 import { TokenPayload, USER_ROLES, User } from "../models/Users";
 import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
@@ -16,12 +17,16 @@ export class UserBusiness {
     ) { }
 
     public signup = async (input: SignupInputDTO): Promise<SignupOutputDTO> => {
-        const { name, email, password } = input
+        const { name, email, password } = input;
 
-        const id = this.idGenerator.generate()
-
-        const hashedPassword = await this.hashManager.hash(password)
-
+        const existingUser = await this.userDatabse.findUserByEmail(email);
+        if (existingUser) {
+            throw new ConflictError("Este e-mail já está em uso. Por favor, escolha outro e-mail.");
+        }
+    
+        const id = this.idGenerator.generate();
+        const hashedPassword = await this.hashManager.hash(password);
+    
         const user = new User(
             id,
             name,
@@ -29,25 +34,25 @@ export class UserBusiness {
             hashedPassword,
             USER_ROLES.NORMAL,
             new Date().toISOString()
-        )
-
-        const userDB = user.toDBModel()
-        await this.userDatabse.insertUser(userDB)
-
+        );
+    
+        const userDB = user.toDBModel();
+        await this.userDatabse.insertUser(userDB);
+    
         const payload: TokenPayload = {
             id: user.getId(),
             name: user.getName(),
-            role: user.getRole()
-        }
-
-        const token = this.tokenManager.createToken(payload)
-
+            role: user.getRole(),
+        };
+    
+        const token = this.tokenManager.createToken(payload);
+    
         const output: SignupOutputDTO = {
-            token
-        }
-
-        return output
-    }
+            token,
+        };
+    
+        return output;
+    };
 
     public login = async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
         const { email, password } = input
@@ -73,7 +78,7 @@ export class UserBusiness {
             .compare(password, hashedPassword)
 
         if (!isPasswordCorrect) {
-            throw new BadRequestError("e-mail e/ou senha inválido(s)")
+            throw new BadRequestError("E-mail e/ou senha inválidos. Por favor, verifique tente novamente.")
         }
 
         const payload: TokenPayload = {
