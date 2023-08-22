@@ -4,7 +4,7 @@ import { CommentDatabase } from '../database/tables/CommentDatabase';
 import { CreateCommentInputDTO, CreateCommentOutputDTO } from '../dto/comment/createComment.dto';
 import { BadRequestError } from '../errors/BadRequestError';
 import { NotFoundError } from '../errors/NotFoundError';
-import { Comment, CommentWithCreatorDB } from '../models/Comments';
+import { Comment, CommentWithCreatorDB, LikesDislikesCommentsDB } from '../models/Comments';
 import { Post } from '../models/Posts';
 import { CreatePostOutputDTO } from '../dto/post/createPost.dto';
 import { PostDatabase } from '../database/tables/PostDatabase';
@@ -12,6 +12,8 @@ import { GetCommentInputDTO, GetCommentOutputDTO } from '../dto/comment/getComme
 import { EditCommentInputDTO, EditCommentOutputDTO } from '../dto/comment/editComment.dto';
 import { DeleteCommentInputDTO, DeleteCommentOutputDTO } from '../dto/comment/deleteComment.dto';
 import { USER_ROLES } from '../models/Users';
+import { LikeOrDislikeCommentInputDTO } from '../dto/comment/likeOrDislikeComment.dto';
+import { LikeOrDislikePostOutputDTO } from '../dto/post/likeOrDislikePost.dto';
 
 export class CommentBusiness {
     constructor(
@@ -25,24 +27,24 @@ export class CommentBusiness {
         const { id, token, content } = input
 
 
-        if (token === undefined) {
-            throw new BadRequestError("'token' ausente")
+        if (!token) {
+            throw new BadRequestError("O campo 'token' é obrigatório.")
         }
 
-        if (content.length <= 0) {
-            throw new BadRequestError("'content' não pode ser zero ou negativo")
+        if (content.length === 0) {
+            throw new BadRequestError("O campo 'content' não pode estar vazio.")
         }
 
         const tokenPayload = this.tokenManager.getPayload(token)
 
-        if (tokenPayload === null) {
-            throw new BadRequestError("'token' inválido")
+        if (!tokenPayload) {
+            throw new BadRequestError("Token inválido ou expirado.")
         }
 
         const post = await this.commentDatabase.findPost(id)
 
         if (!post) {
-            throw new NotFoundError("'post' não encontrado")
+            throw new NotFoundError("Post não encontrado.")
         }
 
         const commentId = this.idGenerator.generate()
@@ -69,7 +71,7 @@ export class CommentBusiness {
             post.content,
             post.likes,
             post.dislikes,
-            post.comments_post,
+            post.comments_post + 1,
             post.created_at,
             post.updated_at,
             post.creator_id,
@@ -89,7 +91,7 @@ export class CommentBusiness {
         const { id, token } = input
 
         if (token === undefined) {
-            throw new BadRequestError("'token' ausente")
+            throw new BadRequestError("O campo 'token' é obrigatório.")
         }
 
         const tokenPayload = this.tokenManager.getPayload(token)
@@ -131,17 +133,17 @@ export class CommentBusiness {
         const { id, token, content } = input
 
         if (token === undefined) {
-            throw new BadRequestError("'token' ausente")
+            throw new BadRequestError("O campo 'token' é obrigatório.")
         }
 
         if (content.length <= 0) {
-            throw new BadRequestError("'content' não pode ser zero ou negativo")
+            throw new BadRequestError("O campo 'content' não pode estar vazio.")
         }
 
         const tokenPayload = this.tokenManager.getPayload(token)
 
         if (tokenPayload === null) {
-            throw new BadRequestError("'token' inválido")
+            throw new BadRequestError("O campo 'token' é obrigatório.")
         }
 
         const commentToEditDB = await this.commentDatabase.findComment(id)
@@ -187,7 +189,7 @@ export class CommentBusiness {
         const { id, token } = input
 
         if (token === undefined) {
-            throw new BadRequestError("'token' ausente")
+            throw new BadRequestError("O campo 'token' é obrigatório.")
         }
 
         const tokenPayload = this.tokenManager.getPayload(token)
@@ -214,6 +216,86 @@ export class CommentBusiness {
         await this.commentDatabase.deleteComment(id)
 
         const output: DeleteCommentOutputDTO = undefined
+
+        return output
+    }
+
+    public likeOrDislikeComment = async (input:LikeOrDislikeCommentInputDTO): Promise<LikeOrDislikePostOutputDTO> => {
+        const { id, token, like } = input
+
+        if (token === undefined) {
+            throw new BadRequestError("O campo 'token' é obrigatório.")
+        }
+
+        const tokenPayload = this.tokenManager.getPayload(token)
+
+        if (tokenPayload === null) {
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const likeDislikeCommentDB = await this.commentDatabase.findCommentWithCreatorId(id)
+
+        if (!likeDislikeCommentDB) {
+            throw new NotFoundError("'id' não encontrado")
+        }
+
+        const userId = tokenPayload.id
+        const likeDB = like ? 1 : 0
+
+        if (likeDislikeCommentDB.creator_id === userId) {
+            throw new BadRequestError("Quem criou o post não pode dar 'like' ou 'dislike' no mesmo")
+        }
+
+        const likeDislikeDB: LikesDislikesCommentsDB = {
+            user_id: userId,,
+            
+            comments_id: likeDislikeCommentDB.id,
+            like: likeDB
+        }
+
+        const comment = new Comment(
+            likeDislikeCommentDB.id,
+            likeDislikeCommentDB.post_id,
+            likeDislikeCommentDB.content,
+            likeDislikeCommentDB.likes,
+            likeDislikeCommentDB.dislikes,
+            likeDislikeCommentDB.created_at,
+            likeDislikeCommentDB.updated_at,
+            likeDislikeCommentDB.creator_id,
+            likeDislikeCommentDB.creator_name
+        )
+
+        const likeDislikeExists = await this.commentDatabase.findLikeDislike(likeDislikeDB)
+
+        if (likeDislikeExists === "already liked") {
+            if (like) {
+                await this.commentDatabase.removeLikeDislike(likeDislikeDB)
+                comment.removeLike()
+            } else {
+                await this.commentDatabase.updateLikeDislike(likeDislikeDB)
+                comment.removeLike()
+                comment.addDislike()
+            }
+        } else if (likeDislikeExists === "already disliked") {
+            if (like) {
+                await this.commentDatabase.removeLikeDislike(likeDislikeDB)
+                comment.removeDislike()
+                comment.addLike()
+            } else {
+                await this.commentDatabase.updateLikeDislike(likeDislikeDB)
+                comment.removeDislike()
+            }
+        } else {
+            await this.commentDatabase.likeOrDislikeComment(likeDislikeDB)
+
+            like ? comment.addLike() : comment.addDislike()
+
+        }
+
+        const updatedPostDB = comment.toCommentDB()
+        await this.commentDatabase.updateComment(updatedPostDB)
+
+        const output: LikeOrDislikePostOutputDTO = undefined
 
         return output
     }
