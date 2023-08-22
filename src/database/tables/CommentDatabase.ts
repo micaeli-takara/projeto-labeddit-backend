@@ -60,4 +60,16 @@ export class CommentDatabase extends BaseDatabase {
             .update(commentDB)
             .where({ id: commentDB.id })
     }
+
+    public async deleteComment(id: string): Promise<void> {
+        await BaseDatabase
+            .connection(CommentDatabase.TABLE_COMMENT_LIKES_DISLIKES)
+            .delete()
+            .where({ comments_id: id })
+
+        await BaseDatabase
+            .connection(CommentDatabase.TABLE_COMMENT)
+            .delete()
+            .where({ id: id })
+    }
 }

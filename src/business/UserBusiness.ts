@@ -16,7 +16,7 @@ export class UserBusiness {
     ) { }
 
     public signup = async (input: SignupInputDTO): Promise<SignupOutputDTO> => {
-        const { name, surname, email, password } = input
+        const { name, email, password } = input
 
         const id = this.idGenerator.generate()
 
