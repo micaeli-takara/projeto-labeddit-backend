@@ -10,6 +10,8 @@ import { CreatePostOutputDTO } from '../dto/post/createPost.dto';
 import { PostDatabase } from '../database/tables/PostDatabase';
 import { GetCommentInputDTO, GetCommentOutputDTO } from '../dto/comment/getComment.dto';
 import { EditCommentInputDTO, EditCommentOutputDTO } from '../dto/comment/editComment.dto';
+import { DeleteCommentInputDTO, DeleteCommentOutputDTO } from '../dto/comment/deleteComment.dto';
+import { USER_ROLES } from '../models/Users';
 
 export class CommentBusiness {
     constructor(
@@ -179,5 +181,40 @@ export class CommentBusiness {
 
         return output
 
+    }
+
+    public deleteComment = async (input: DeleteCommentInputDTO): Promise<DeleteCommentOutputDTO> => {
+        const { id, token } = input
+
+        if (token === undefined) {
+            throw new BadRequestError("'token' ausente")
+        }
+
+        const tokenPayload = this.tokenManager.getPayload(token)
+
+        if (tokenPayload === null) {
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const commentToDeleteDB = await this.commentDatabase.findComment(id)
+
+        if (!commentToDeleteDB) {
+            throw new NotFoundError("'id' não encontrado")
+        }
+
+        const creatorId = tokenPayload.id
+
+        if (
+            tokenPayload.role !== USER_ROLES.ADMIN &&
+            commentToDeleteDB.creator_id !== creatorId
+        ) {
+            throw new BadRequestError("usuário não autorizado a deletar este post")
+        }
+
+        await this.commentDatabase.deleteComment(id)
+
+        const output: DeleteCommentOutputDTO = undefined
+
+        return output
     }
 }

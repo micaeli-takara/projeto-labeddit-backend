@@ -10,8 +10,11 @@ CREATE TABLE users (
 
 INSERT INTO users (id, name, email, password, role)
 VALUES
+     -- tipo NORMAL e senha = fulano123
     ('u001', 'Fulano','fulano@email.com', '$2a$12$qPQj5Lm1dQK2auALLTC0dOWedtr/Th.aSFf3.pdK5jCmYelFrYadC', 'NORMAL'),
+     -- tipo NORMAL e senha = beltrana00
     ('u002', 'Beltrana', 'beltrana@email.com', '$2a$12$403HVkfVSUbDioyciv9IC.oBlgMqudbnQL8ubebJIXScNs8E3jYe2', 'NORMAL'),
+      -- tipo ADMIN e senha = astrodev99
     ('u003', 'Astrodev','astrodev@email.com', '$2a$12$lHyD.hKs3JDGu2nIbBrxYujrnfIX5RW5oq/B41HCKf7TSaq9RgqJ.', 'ADMIN');
 
 CREATE TABLE posts(
@@ -80,19 +83,20 @@ VALUES
 
 CREATE TABLE comment_likes_dislikes (
     user_id TEXT NOT NULL,
-    comment_id TEXT NOT NULL,
+    comments_id TEXT NOT NULL,
     like INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE,
-    FOREIGN KEY (comment_id) REFERENCES comments(id)
+    FOREIGN KEY (comments_id) REFERENCES comments(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE
 );
 
-INSERT INTO comment_likes_dislikes (user_id, comment_id, like)
+INSERT INTO comment_likes_dislikes (user_id, comments_id, like)
 VALUES
     ('u001', 'c001', 1),
     ('u002', 'c001', 1),
     ('u003', 'c002', 1),
     ('u001', 'c003', 0);
+
