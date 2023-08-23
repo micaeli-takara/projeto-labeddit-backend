@@ -17,12 +17,14 @@ export class UserController {
                 name: req.body.name,
                 email: req.body.email,
                 password: req.body.password,
-                agreeToEmails: req.body.agreeToEmails
             })
 
             const output = await this.userBusiness.signup(input)
 
-            res.status(201).send(output)
+            res.status(201).send({
+                message: "Cadastro realizado com sucesso",
+                output
+            })
 
         } catch (error) {
             console.log(error)
