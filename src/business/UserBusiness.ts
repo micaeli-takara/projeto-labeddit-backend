@@ -16,10 +16,11 @@ export class UserBusiness {
         private hashManager: HashManager
     ) { }
 
-    public signup = async (input: SignupInputDTO): Promise<SignupOutputDTO> => {
+    public signup = async (input: SignupInputDTO): Promise <SignupOutputDTO> => {
         const { name, email, password } = input;
 
         const existingUser = await this.userDatabse.findUserByEmail(email);
+        
         if (existingUser) {
             throw new ConflictError("Este e-mail já está em uso. Por favor, escolha outro e-mail.");
         }
@@ -48,13 +49,13 @@ export class UserBusiness {
         const token = this.tokenManager.createToken(payload);
     
         const output: SignupOutputDTO = {
-            token,
-        };
+            token
+        }
     
-        return output;
+        return output
     };
 
-    public login = async (input: LoginInputDTO): Promise<LoginOutputDTO> => {
+    public login = async (input: LoginInputDTO): Promise <LoginOutputDTO> => {
         const { email, password } = input
 
         const userDB = await this.userDatabse.findUserByEmail(email)
