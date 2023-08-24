@@ -43,7 +43,7 @@ export class UserBusiness {
         const payload: TokenPayload = {
             id: user.getId(),
             name: user.getName(),
-            role: user.getRole(),
+            role: user.getRole()
         };
     
         const token = this.tokenManager.createToken(payload);

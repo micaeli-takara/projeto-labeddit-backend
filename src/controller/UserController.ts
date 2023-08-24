@@ -16,7 +16,7 @@ export class UserController {
             const input = SignupSchema.parse({
                 name: req.body.name,
                 email: req.body.email,
-                password: req.body.password,
+                password: req.body.password
             })
 
             const output = await this.userBusiness.signup(input)
@@ -47,7 +47,10 @@ export class UserController {
 
             const output = await this.userBusiness.login(input)
 
-            res.status(201).send(output)
+            res.status(201).send({
+                message: "Login realizado com sucesso. Seja bem-vindo(a)",
+                output
+            })
 
         } catch (error) {
             console.log(error)
