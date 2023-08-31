@@ -1,10 +1,10 @@
-import { UserBusiness } from "../../src/business/UserBusiness";
-import { UserDatabaseMock } from "../mocks/UserDatabaseMock";
-import { IdGeneratorMock } from "../mocks/IdGeneratorMock";
-import { TokenManagerMock } from "../mocks/TokenManagerMock";
-import { HashManagerMock } from "../mocks/HashManagerMock";
-import { LoginSchema } from "../../src/dto/user/login.dto";
-import { BadRequestError } from "../../src/errors/BadRequestError";
+import { UserBusiness } from "../../../src/business/UserBusiness";
+import { UserDatabaseMock } from "../../mocks/UserDatabaseMock";
+import { IdGeneratorMock } from "../../mocks/IdGeneratorMock";
+import { TokenManagerMock } from "../../mocks/TokenManagerMock";
+import { HashManagerMock } from "../../mocks/HashManagerMock";
+import { LoginSchema } from "../../../src/dto/user/login.dto";
+import { BadRequestError } from "../../../src/errors/BadRequestError";
 
 describe("Teste de Login do Usuário", () => {
     const userBusiness = new UserBusiness(

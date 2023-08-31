@@ -26,6 +26,8 @@ export class PostDatabase extends BaseDatabase {
                 `${PostDatabase.TABLE_POST}.creator_id`,
                 "=",
                 `${UserDatabase.TABLE_USER}.id`
+            ).orderBy(
+                "likes", "desc"
             )
         return result
     }
@@ -78,22 +80,22 @@ export class PostDatabase extends BaseDatabase {
                 "=",
                 `${UserDatabase.TABLE_USER}.id`
             )
-        .where({ [`${PostDatabase.TABLE_POST}.id`]: id })
+            .where({ [`${PostDatabase.TABLE_POST}.id`]: id })
 
         return result as PostWithCreatorDB | undefined
     }
 
     public findLikeDislike = async (likeDislikeDB: LikeDislikeDB): Promise<POST_LIKE | undefined> => {
 
-        const [result]: Array <LikeDislikeDB | undefined> = await BaseDatabase
-        .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
-        .select()
-        .where({
-            user_id: likeDislikeDB.user_id,
-            post_id: likeDislikeDB.post_id
-        })
+        const [result]: Array<LikeDislikeDB | undefined> = await BaseDatabase
+            .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
+            .select()
+            .where({
+                user_id: likeDislikeDB.user_id,
+                post_id: likeDislikeDB.post_id
+            })
 
-        if(result === undefined) {
+        if (result === undefined) {
             return undefined
         } else if (result.like === 1) {
             return POST_LIKE.ON_LIKED
@@ -111,17 +113,17 @@ export class PostDatabase extends BaseDatabase {
 
     public updatedLikeDislike = async (likeDislikeDB: LikeDislikeDB): Promise<void> => {
         await BaseDatabase
-        .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
-        .update(likeDislikeDB)
-        .where({
-            user_id: likeDislikeDB.user_id,
-            post_id: likeDislikeDB.post_id
-        })
+            .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
+            .update(likeDislikeDB)
+            .where({
+                user_id: likeDislikeDB.user_id,
+                post_id: likeDislikeDB.post_id
+            })
     }
 
     public insertLikeDislike = async (likeDislikeDB: LikeDislikeDB): Promise<void> => {
         await BaseDatabase
-        .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
-        .insert(likeDislikeDB)
+            .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
+            .insert(likeDislikeDB)
     }
 }

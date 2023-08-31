@@ -1,11 +1,11 @@
-import { UserBusiness } from "../../src/business/UserBusiness";
-import { SignupSchema } from "../../src/dto/user/signup.dto";
-import { UserDatabaseMock } from "../mocks/UserDatabaseMock";
-import { IdGeneratorMock } from "../mocks/IdGeneratorMock";
-import { TokenManagerMock } from "../mocks/TokenManagerMock";
-import { HashManagerMock } from "../mocks/HashManagerMock";
-import { USER_ROLES } from "../../src/models/Users";
-import { ConflictError } from "../../src/errors/ConflictError";
+import { UserBusiness } from "../../../src/business/UserBusiness";
+import { SignupSchema } from "../../../src/dto/user/signup.dto";
+import { UserDatabaseMock } from "../../mocks/UserDatabaseMock";
+import { IdGeneratorMock } from "../../mocks/IdGeneratorMock";
+import { TokenManagerMock } from "../../mocks/TokenManagerMock";
+import { HashManagerMock } from "../../mocks/HashManagerMock";
+import { USER_ROLES } from "../../../src/models/Users";
+import { ConflictError } from "../../../src/errors/ConflictError";
 
 describe("Testando o cadastro de usuário", () => {
     const userBusiness = new UserBusiness(

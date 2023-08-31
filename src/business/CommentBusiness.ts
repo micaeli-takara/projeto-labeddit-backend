@@ -71,7 +71,7 @@ export class CommentBusiness {
             post.content,
             post.likes,
             post.dislikes,
-            post.comments_post + 1,
+            post.comments_post,
             post.created_at,
             post.updated_at,
             post.creator_id,

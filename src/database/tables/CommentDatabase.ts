@@ -1,5 +1,5 @@
 import { CommentDB, CommentWithCreatorDB, LikesDislikesCommentsDB } from "../../models/Comments";
-import {  PostWithCreatorDB } from "../../models/Posts";
+import { PostWithCreatorDB } from "../../models/Posts";
 import { BaseDatabase } from "../BaseDatabase";
 import { UserDatabase } from "./UserDatabase";
 
@@ -40,7 +40,11 @@ export class CommentDatabase extends BaseDatabase {
                 `${CommentDatabase.TABLE_COMMENT}.creator_id`,
                 "=",
                 `${UserDatabase.TABLE_USER}.id`
-            ).where({ post_id: id })
+            ).where({
+                post_id: id
+            }).orderBy(
+                "likes", "desc"
+            )
 
         return result
     }
