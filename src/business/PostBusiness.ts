@@ -2,6 +2,7 @@ import { PostDatabase } from "../database/tables/PostDatabase";
 import { CreatePostInputDTO, CreatePostOutputDTO } from "../dto/post/createPost.dto";
 import { DeletePostInputDTO, DeletePostOutputDTO } from "../dto/post/deletePost.dto";
 import { EditPostInputDTO, EditPostOutputDTO } from "../dto/post/editPost.dto";
+import { GetLikeDislikeInputDTO, GetLikeDislikeOutputDTO } from "../dto/post/getLikeDislike.dto";
 import { GetPostInputDTO, GetPostOutputDTO } from "../dto/post/getPost.dto";
 import { LikeOrDislikePostInputDTO, LikeOrDislikePostOutputDTO } from "../dto/post/likeOrDislikePost.dto";
 import { BadRequestError } from "../errors/BadRequestError";
@@ -197,8 +198,6 @@ export class PostBusiness {
             postDBWithCreatorName.creator_name
         )
 
-        console.log(post)
-
         const likeSQLite = like ? 1 : 0
 
         const likeDislikeDB: LikeDislikeDB = {
@@ -242,5 +241,27 @@ export class PostBusiness {
         const output: LikeOrDislikePostOutputDTO = undefined
 
         return output
+    }
+    
+    public getLikeDislike = async (input: GetLikeDislikeInputDTO): Promise<any> => {
+        const {postId, userId, token } = input
+
+        const userToken = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString())
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if (!payload) {
+            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
+        } 
+
+        const likeDislikeDB: LikeDislikeDB = {
+            user_id: userToken.id,
+            post_id: postId,
+            like: 1
+        }
+
+        const likeDislikeExists = await this.postDatabase.findLikeDislike(likeDislikeDB)    
+        
+        return likeDislikeExists
     }
 }
