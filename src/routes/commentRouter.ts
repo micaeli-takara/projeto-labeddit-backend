@@ -26,3 +26,5 @@ commentRouter.put("/:id", commentController.editComment)
 commentRouter.delete("/:id", commentController.deleteComment)
 
 commentRouter.put("/:id/like", commentController.likeOrDislikeComment)
+
+commentRouter.get("/:commentId/:userId/like", commentController.getLikeDislikeComment);

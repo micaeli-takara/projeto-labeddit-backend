@@ -48,7 +48,8 @@ export class PostDatabase extends BaseDatabase {
     }
 
     public updatePost = async (postDB: PostDB): Promise<void> => {
-        await BaseDatabase.connection(PostDatabase.TABLE_POST)
+        await BaseDatabase
+            .connection(PostDatabase.TABLE_POST)
             .update(postDB)
             .where({ id: postDB.id })
     }
@@ -105,10 +106,13 @@ export class PostDatabase extends BaseDatabase {
     }
 
     public removeLikeDislike = async (likeDislikeDB: LikeDislikeDB): Promise<void> => {
-        await BaseDatabase.connection(PostDatabase.TABLE_POST_LIKES_DISLIKES).delete().where({
-            user_id: likeDislikeDB.user_id,
-            post_id: likeDislikeDB.post_id
-        })
+        await BaseDatabase
+            .connection(PostDatabase.TABLE_POST_LIKES_DISLIKES)
+            .delete()
+            .where({
+                user_id: likeDislikeDB.user_id,
+                post_id: likeDislikeDB.post_id
+            })
     }
 
     public updatedLikeDislike = async (likeDislikeDB: LikeDislikeDB): Promise<void> => {
@@ -127,5 +131,5 @@ export class PostDatabase extends BaseDatabase {
             .insert(likeDislikeDB)
     }
 
-    
+
 }

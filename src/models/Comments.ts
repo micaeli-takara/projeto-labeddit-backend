@@ -34,6 +34,12 @@ export interface LikesDislikesCommentsDB {
     like: number
 }
 
+export enum COMMENT_LIKE {
+    ON_LIKED = "already liked",
+    ON_DISLIKED = "already disliked"
+}
+
+
 export class Comment {
     constructor(
         private id: string,
@@ -58,51 +64,39 @@ export class Comment {
     public getPostId() : string {
         return this.postId
     }
- 
     public setPostId (value : string): void {
         this.postId = value
     }
-
     public getContent() : string {
         return this.content
     }
- 
     public setContent (value : string): void {
         this.content = value
     }
-
     public getLikes() : number {
         return this.likes
     }
- 
     public setLikes (value : number): void {
         this.likes = value
     }
-
-    public addLike() {
-        this.likes += 1
+    public addLike = () : void => {
+        this.likes ++
     }
-
-    public removeLike() {
-        this.likes -= 1
+    public removeLike = (): void => {
+        this.likes --
     }
-
     public getDislikes() : number {
         return this.dislikes
     }
- 
     public setDislikes (value : number): void {
         this.dislikes = value
     }
-
-    public addDislike() {
-        this.dislikes += 1
+    public addDislike = (): void => {
+        this.dislikes ++
     }
-
-    public removeDislike() {
-        this.dislikes -= 1
+    public removeDislike = (): void => {
+        this.dislikes --
     }
-
     public getCreatedAt(): string {
         return this.createdAt
     }

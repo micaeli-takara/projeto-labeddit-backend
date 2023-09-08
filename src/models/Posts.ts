@@ -69,7 +69,6 @@ export class Post {
     public setContent(value: string): void {
         this.content = value
     }
-
     public getLikes(): number {
         return this.likes
     }
@@ -82,26 +81,21 @@ export class Post {
     public removeLike = (): void => {
         this.likes--
     }
-
     public getDislikes(): number {
         return this.dislikes
     }
     public setDislikes(value: number): void {
         this.dislikes = value
     }
-
     public addDislike = () : void => {
         this.dislikes ++
     }
-
     public removeDislike = () : void => {
         this.dislikes --
     }
-
     public getCommentsPost() : number {
         return this.commentsPost
     }
- 
     public setCommentsPost (value : number): void {
         this.commentsPost = value
     }
