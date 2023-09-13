@@ -27,13 +27,13 @@ export interface PostWithCreatorDB extends PostDB {
     creator_name: string
 }
 
-export interface LikeDislikeDB{
+export interface LikeDislikeDB {
     user_id: string,
     post_id: string,
     like: number
 }
 
-export interface GetLikeDislikeDB{
+export interface GetLikeDislikeDB {
     user_id: string,
     post_id: string
 }
@@ -75,8 +75,8 @@ export class Post {
     public setLikes(value: number): void {
         this.likes = value
     }
-    public addLike = () : void => {
-        this.likes ++
+    public addLike = (): void => {
+        this.likes++
     }
     public removeLike = (): void => {
         this.likes--
@@ -87,21 +87,24 @@ export class Post {
     public setDislikes(value: number): void {
         this.dislikes = value
     }
-    public addDislike = () : void => {
-        this.dislikes ++
+    public addDislike = (): void => {
+        this.dislikes++
     }
-    public removeDislike = () : void => {
-        this.dislikes --
+    public removeDislike = (): void => {
+        this.dislikes--
     }
-    public getCommentsPost() : number {
+    public getCommentsPost(): number {
         return this.commentsPost
     }
-    public setCommentsPost (value : number): void {
+    public setCommentsPost(value: number): void {
         this.commentsPost = value
     }
 
-    public addCommentsPosts() {
-        this.commentsPost ++
+    public addCommentsPosts = (): void => {
+        this.commentsPost++
+    }
+    public removeCommentsPosts = (): void => {
+        this.commentsPost--
     }
 
     public getCreatedAt(): string {

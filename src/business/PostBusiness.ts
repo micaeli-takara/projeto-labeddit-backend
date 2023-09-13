@@ -243,7 +243,8 @@ export class PostBusiness {
         return output
     }
     
-    public getLikeDislike = async (input: GetLikeDislikeInputDTO): Promise<any> => {
+    public getLikeDislike = async (
+        input: GetLikeDislikeInputDTO): Promise<any> => {
         const {postId, userId, token } = input
 
         const userToken = JSON.parse(Buffer.from(token.split(".")[1], "base64").toString())
@@ -265,7 +266,8 @@ export class PostBusiness {
         return likeDislikeExists
     }
 
-    public getPostById = async (input: GetPostByIdInputDTO): Promise<any> => {
+    public getPostById = async (
+        input: GetPostByIdInputDTO): Promise<any> => {
         const {postId, token } = input
 
         const payload = this.tokenManager.getPayload(token)

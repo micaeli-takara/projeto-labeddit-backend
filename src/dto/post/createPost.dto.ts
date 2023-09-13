@@ -8,6 +8,6 @@ export interface CreatePostInputDTO{
 export type CreatePostOutputDTO = undefined
 
 export const CreatePostSchema = z.object({
-    content: z.string().min(1).max(100),
+    content: z.string().min(1).max(480),
     token: z.string().min(1)
 }).transform(data => data as CreatePostInputDTO)

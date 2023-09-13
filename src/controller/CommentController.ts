@@ -22,6 +22,11 @@ export class CommentController {
                 content: req.body.content
             });
 
+            if (input.content.length > 480) {
+                res.status(400).send("O conteúdo do post não pode exceder 480 caracteres.");
+                return;
+            }
+
             const output = await this.commentBusiness.createComment(input);
 
             res.status(201).send({
@@ -97,7 +102,8 @@ export class CommentController {
     public deleteComment = async (req: Request, res: Response) => {
         try {
             const input = DeleteCommentSchema.parse({  
-                id: req.params.id,
+                commentId: req.params.commentId,
+                postId: req.params.postId,
                 token: req.headers.authorization
             });
 

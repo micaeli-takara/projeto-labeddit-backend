@@ -186,7 +186,7 @@ export class CommentBusiness {
     }
 
     public deleteComment = async (input: DeleteCommentInputDTO): Promise<DeleteCommentOutputDTO> => {
-        const { id, token } = input
+        const { commentId, postId, token } = input
 
         if (token === undefined) {
             throw new BadRequestError("O campo 'token' é obrigatório.")
@@ -198,7 +198,7 @@ export class CommentBusiness {
             throw new BadRequestError("'token' inválido")
         }
 
-        const commentToDeleteDB = await this.commentDatabase.findComment(id)
+        const commentToDeleteDB = await this.commentDatabase.findComment(commentId)
 
         if (!commentToDeleteDB) {
             throw new NotFoundError("'id' não encontrado")
@@ -213,7 +213,29 @@ export class CommentBusiness {
             throw new BadRequestError("usuário não autorizado a deletar este post")
         }
 
-        await this.commentDatabase.deleteComment(id)
+        await this.commentDatabase.deleteComment(commentId)
+
+        const post = await this.commentDatabase.findPost(postId)
+
+        if (!post) {
+            throw new NotFoundError("Post não encontrado.")
+        }
+
+        const updateCommentCount = new Post(
+            post.id,
+            post.content,
+            post.likes,
+            post.dislikes,
+            post.comments_post,
+            post.created_at,
+            post.updated_at,
+            post.creator_id,
+            post.creator_name
+        )
+        updateCommentCount.removeCommentsPosts()
+
+        const postDB = updateCommentCount.toDBModel()
+        await this.postDatabase.updatePost(postDB)
 
         const output: DeleteCommentOutputDTO = undefined
 
@@ -275,7 +297,7 @@ export class CommentBusiness {
 
             } else {
                 await this.commentDatabase.updateLikeDislike(likeDislikeCommentsDB)
-                comment.removeLike()
+                comment.removeDislike()
                 comment.addLike()
             }
         } else {
