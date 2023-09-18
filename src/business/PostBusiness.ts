@@ -1,10 +1,8 @@
 import { PostDatabase } from "../database/tables/PostDatabase";
 import { CreatePostInputDTO, CreatePostOutputDTO } from "../dto/post/createPost.dto";
 import { DeletePostInputDTO, DeletePostOutputDTO } from "../dto/post/deletePost.dto";
-import { EditPostInputDTO, EditPostOutputDTO } from "../dto/post/editPost.dto";
 import { GetLikeDislikeInputDTO } from "../dto/post/getLikeDislike.dto";
 import { GetPostInputDTO, GetPostOutputDTO } from "../dto/post/getPost.dto";
-import { GetPostByIdInputDTO } from "../dto/post/getPostById.dto";
 import { LikeOrDislikePostInputDTO, LikeOrDislikePostOutputDTO } from "../dto/post/likeOrDislikePost.dto";
 import { BadRequestError } from "../errors/BadRequestError";
 import { ForbiddenError } from "../errors/ForbiddenError";
@@ -92,50 +90,6 @@ export class PostBusiness {
             return post.toModel()
         })
         const output: GetPostOutputDTO = posts
-
-        return output
-    }
-
-    public editPost = async (
-        input: EditPostInputDTO
-    ): Promise<EditPostOutputDTO> => {
-        const { content, token, idToEdit } = input
-
-        const payload = this.tokenManager.getPayload(token)
-
-        if (!payload) {
-            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
-        }
-
-        const postDB = await this.postDatabase.findPostById(idToEdit)
-
-        if (!postDB) {
-            throw new NotFoundError("Postagem não encontrada.")
-        }
-
-        if (payload.id !== postDB.creator_id) {
-            throw new ForbiddenError("Você não tem permissão para editar esta postagem.")
-        }
-
-        const post = new Post(
-            postDB.id,
-            postDB.content,
-            postDB.likes,
-            postDB.dislikes,
-            postDB.comments_post,
-            postDB.created_at,
-            postDB.updated_at,
-            postDB.creator_id,
-            payload.name
-        )
-
-        post.setContent(content)
-
-        const updatedPostDB = post.toDBModel()
-
-        await this.postDatabase.updatePost(updatedPostDB)
-
-        const output: EditPostOutputDTO = undefined
 
         return output
     }
@@ -264,20 +218,5 @@ export class PostBusiness {
         const likeDislikeExists = await this.postDatabase.findLikeDislike(likeDislikeDB)    
         
         return likeDislikeExists
-    }
-
-    public getPostById = async (
-        input: GetPostByIdInputDTO): Promise<any> => {
-        const {postId, token } = input
-
-        const payload = this.tokenManager.getPayload(token)
-
-        if (!payload) {
-            throw new UnauthorizedError("Token inválido ou expirado. Faça login novamente.")
-        }
-
-        const postDB = await this.postDatabase.findPostById(postId)
-
-        return postDB
     }
 }

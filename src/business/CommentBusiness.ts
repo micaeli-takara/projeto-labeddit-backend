@@ -8,7 +8,6 @@ import { COMMENT_LIKE, Comment, CommentWithCreatorDB, LikesDislikesCommentsDB } 
 import { Post } from '../models/Posts';
 import { PostDatabase } from '../database/tables/PostDatabase';
 import { GetCommentInputDTO, GetCommentOutputDTO } from '../dto/comment/getComment.dto';
-import { EditCommentInputDTO, EditCommentOutputDTO } from '../dto/comment/editComment.dto';
 import { DeleteCommentInputDTO, DeleteCommentOutputDTO } from '../dto/comment/deleteComment.dto';
 import { USER_ROLES } from '../models/Users';
 import { LikeOrDislikeCommentInputDTO, LikeOrDislikeCommentOutputDTO } from '../dto/comment/likeOrDislikeComment.dto';
@@ -125,63 +124,6 @@ export class CommentBusiness {
 
         return output
 
-
-    }
-
-    public editComment = async (input: EditCommentInputDTO): Promise<EditCommentOutputDTO> => {
-
-        const { id, token, content } = input
-
-        if (token === undefined) {
-            throw new BadRequestError("O campo 'token' é obrigatório.")
-        }
-
-        if (content.length <= 0) {
-            throw new BadRequestError("O campo 'content' não pode estar vazio.")
-        }
-
-        const tokenPayload = this.tokenManager.getPayload(token)
-
-        if (tokenPayload === null) {
-            throw new BadRequestError("O campo 'token' é obrigatório.")
-        }
-
-        const commentToEditDB = await this.commentDatabase.findComment(id)
-
-        if (!commentToEditDB) {
-            throw new NotFoundError("'id' não encontrado")
-        }
-
-        const creatorId = tokenPayload.id
-
-        if (commentToEditDB.creator_id !== creatorId) {
-            throw new BadRequestError("usuário não autorizado a editar este comentário")
-        }
-
-        const creatorName = tokenPayload.name
-
-        const commentToEdit = new Comment(
-            commentToEditDB.id,
-            commentToEditDB.post_id,
-            commentToEditDB.content,
-            commentToEditDB.likes,
-            commentToEditDB.dislikes,
-            commentToEditDB.created_at,
-            commentToEditDB.updated_at,
-            creatorId,
-            creatorName
-        )
-
-        commentToEdit.setContent(content)
-        commentToEdit.setUpdatedAt(new Date().toISOString())
-
-        const updatedCommentDB = commentToEdit.toCommentDB()
-
-        await this.commentDatabase.updateComment(updatedCommentDB)
-
-        const output: EditCommentOutputDTO = undefined
-
-        return output
 
     }
 

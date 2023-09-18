@@ -4,7 +4,6 @@ import { BaseError } from "../errors/BaseError";
 import { CreateCommentSchema } from "../dto/comment/createComment.dto";
 import { ZodError } from "zod";
 import { GetCommentSchema } from "../dto/comment/getComment.dto";
-import { EditCommentSchema } from "../dto/comment/editComment.dto";
 import { DeleteCommentSchema } from "../dto/comment/deleteComment.dto";
 import { LikeOrDislikeCommentSchema } from "../dto/comment/likeOrDislikeComment.dto";
 import { GetLikeDislikeSchema } from "../dto/comment/getLikeDislike.dto";
@@ -71,33 +70,6 @@ export class CommentController {
         }
 
     }
-
-    public editComment = async (req: Request, res: Response) => {
-        try {
-            const input = EditCommentSchema.parse({
-               id: req.params.id,
-               token: req.headers.authorization,
-               content: req.body.content
-            });
-
-            const output = await this.commentBusiness.editComment(input);
-
-            res.status(201).send({
-                message: "Comentário editado com sucesso!",
-                output
-            });
-
-        } catch (error) {
-            console.log(error);
-
-            if (error instanceof BaseError) {
-                res.status(error.statusCode).send(error.message);
-            } else {
-                res.status(500).send("Erro inesperado");
-            }
-        }
-    }
-
 
     public deleteComment = async (req: Request, res: Response) => {
         try {
