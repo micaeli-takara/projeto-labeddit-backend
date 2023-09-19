@@ -165,7 +165,7 @@ Endpoint para exclusão de postagens no Labeddit. Apenas usuários com privilég
 }
 ```
 
-# PUT LikeOrDislike
+# PUT LikeOrDislike Post
 Endpoint para ação de 'like' e 'dislike' em postagens. Se desejar remover a curtida de uma postagem, basta executar a ação de 'like' novamente, definindo-a como 'true', o mesmo vale para o "dislike".
 
 ```https
@@ -206,7 +206,7 @@ ou
 }
 ```
 
-# POST CreateComment
+# POST Create Comment
 
 ```https
   POST https://projeto-labeddit-backend-88qh.onrender.com/comments/:id/post
@@ -264,7 +264,7 @@ ou
 ]
 ```
 
-# DELETE Delete Post
+# DELETE Delete Comment
 
 Endpoint para exclusão de um comentário do Labeddit. Apenas usuários com privilégios de administrador têm permissão para remover qualquer comentário, enquanto os demais usuários podem apagar somente seus próprios comentários.
 
@@ -287,7 +287,7 @@ Endpoint para exclusão de um comentário do Labeddit. Apenas usuários com priv
 }
 ```
 
-# PUT LikeOrDislike
+# PUT LikeOrDislike Comment
 
 Endpoint para ação de 'like' e 'dislike' em comentários. Se desejar remover a curtida de um comentário, basta executar a ação de 'like' novamente, definindo-a como 'true', o mesmo vale para o "dislike".
 
