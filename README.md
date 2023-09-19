@@ -147,7 +147,7 @@ O projeto Labeddit Full Stack é um desafio final do bootcamp Web Full Stack da 
 Endpoint para exclusão de postagens no Labeddit. Apenas usuários com privilégios de administrador têm permissão para remover qualquer postagem, enquanto os demais usuários podem apagar somente as suas próprias postagens.
 
 
-```http
+```https
    DELETE https://projeto-labeddit-backend-88qh.onrender.com/posts/:id
 ```
 
