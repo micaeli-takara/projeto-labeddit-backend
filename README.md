@@ -10,7 +10,7 @@ O projeto Labeddit Full Stack é um desafio final do bootcamp Web Full Stack da 
 
 # POST Signup
 
-```http
+```https
   POST https://projeto-labeddit-backend-88qh.onrender.com/users/signup
 ```
 
