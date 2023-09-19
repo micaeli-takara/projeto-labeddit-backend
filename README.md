@@ -1,11 +1,12 @@
 # Documentação da API LabEddit-backend
 
 O projeto Labeddit Full Stack é um desafio final do bootcamp Web Full Stack da Labenu, que abrange desenvolvimento em backend e frontend. O foco é criar um aplicativo com design mobile-first, com ênfase na parte de backend. Isso envolve a criação de uma API usando TypeScript, Knex e Express, implementando funcionalidades como autenticação de usuários e gerenciamento de banco de dados.
-[Link do repositório Front-end](https://documenter.getpostman.com/view/27685885/2s9YC8xBKG)
+
+## [Link do repositório Front-end](https://github.com/micaeli-takara/projeto-labeddit-frontend)
 
 ## Documentação
 
-[Documentação](https://documenter.getpostman.com/view/27685885/2s9YC8xBKG)
+[Documentação da API](https://documenter.getpostman.com/view/27685885/2s9YC8xBKG)
 
 
 # POST Signup
@@ -204,3 +205,127 @@ ou
   "message": "Comentário descurtido com sucesso!"
 }
 ```
+
+# POST CreateComment
+
+```https
+  POST https://projeto-labeddit-backend-88qh.onrender.com/comments/:id/post
+```
+
+### Parâmetros de consulta:
+
+| Parâmetro   | Tipo       | Descrição                                   |
+| :---------- | :--------- | :------------------------------------------ |
+| `Authorization`      | `key` | **Obrigatório**. A autorização do usuário será gerada no signup ou login |
+
+## Body:
+```json
+{
+    "content": "Adorei!"
+}
+```
+
+## Exemplo de resposta:
+```json
+{
+  "message": "Comentário criado com sucesso!"
+}
+```
+
+# GET Comments
+
+```https
+  GET https://projeto-labeddit-backend-88qh.onrender.com/comments/:id/post
+```
+
+### Parâmetros de caminho:
+
+| Parâmetro   | Tipo       | Descrição                           |
+| :---------- | :--------- | :---------------------------------- |
+| `Authorization` | `key` | **Obrigatório**. A autorização do usuário |
+| `id` | `Path Variables` | **Obrigatório**. O Id da postagem |
+
+## Exemplo de resposta:
+```json
+[
+  {
+    "id": "5233ef4b-df34-4345-a35b-9833d8ea74fa",
+    "postId": "baac81c6-a3a1-46c8-924a-00476c38dcde",
+    "content": "Adorei!",
+    "likes": 0,
+    "dislikes": 0,
+    "createdAt": "2023-09-19T17:38:21.412Z",
+    "updatedAt": "2023-09-19T17:38:21.412Z",
+    "creator": {
+      "id": "e077b25b-4338-4b90-a277-7bc42a07c542",
+      "name": "Visitante"
+    }
+  }
+]
+```
+
+# DELETE Delete Post
+
+Endpoint para exclusão de um comentário do Labeddit. Apenas usuários com privilégios de administrador têm permissão para remover qualquer comentário, enquanto os demais usuários podem apagar somente seus próprios comentários.
+
+
+```https
+   DELETE https://projeto-labeddit-backend-88qh.onrender.com/comments/:commentId/:postId
+```
+
+| Parâmetro   | Tipo       | Descrição                           |
+| :---------- | :--------- | :---------------------------------- |
+| `Authorization` | `key` | **Obrigatório**. A autorização do usuário |
+| `commentId` | `Path Variables` | **Obrigatório**. O Id do comentário que será deletado |
+| `postId` | `Path Variables` | **Obrigatório**. O Id da postagem onde o comentário está |
+
+### Exemplo de resposta:
+
+```json
+{
+  "message": "Comentário deletado com sucesso!"
+}
+```
+
+# PUT LikeOrDislike
+
+Endpoint para ação de 'like' e 'dislike' em comentários. Se desejar remover a curtida de um comentário, basta executar a ação de 'like' novamente, definindo-a como 'true', o mesmo vale para o "dislike".
+
+```https
+  POST https://projeto-labeddit-backend-88qh.onrender.com/comments/:id/like
+```
+
+| Parâmetro   | Tipo       | Descrição                           |
+| :---------- | :--------- | :---------------------------------- |
+| `Authorization` | `key` | **Obrigatório**. A autorização do usuário |
+| `id` | `Path Variables` | **Obrigatório**. O Id do comentário que receberá o like ou o dislike |
+
+## Body:
+Para dar like:
+```json
+{
+    "like": true
+}
+```
+
+para tirar o like:
+```json
+{
+    "like": false
+}
+```
+### Exemplo de resposta:
+
+```json
+{
+  "message": "Comentário curtido com sucesso!"
+}
+```
+
+ou
+```json
+{
+  "message": "Comentário descurtido com sucesso!"
+}
+```
+
