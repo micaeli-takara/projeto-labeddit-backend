@@ -44,7 +44,7 @@ O projeto Labeddit Full Stack é um desafio final do bootcamp Web Full Stack da 
 
 # POST Login
 
-```http
+```https
   POST https://projeto-labeddit-backend-88qh.onrender.com/users/login
 ```
 
@@ -75,7 +75,7 @@ O projeto Labeddit Full Stack é um desafio final do bootcamp Web Full Stack da 
 
 # POST CreatePost
 
-```http
+```https
   POST https://projeto-labeddit-backend-88qh.onrender.com/posts/
 ```
 
@@ -113,7 +113,7 @@ O projeto Labeddit Full Stack é um desafio final do bootcamp Web Full Stack da 
 
 # GET Posts
 
-```http
+```https
   GET https://projeto-labeddit-backend-88qh.onrender.com/posts/
 ```
 
@@ -167,7 +167,7 @@ Endpoint para exclusão de postagens no Labeddit. Apenas usuários com privilég
 # PUT LikeOrDislike
 Endpoint para ação de 'like' e 'dislike' em postagens. Se desejar remover a curtida de uma postagem, basta executar a ação de 'like' novamente, definindo-a como 'true', o mesmo vale para o "dislike".
 
-```http
+```https
   POST https://projeto-labeddit-backend-88qh.onrender.com/posts/:id/like
 ```
 
